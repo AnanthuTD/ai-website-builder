@@ -3,17 +3,19 @@ import "./App.css";
 import AiModal from "./components/global/ai-modal";
 import Editor from "./components/global/studio-editor";
 
-const samplePrompt = `**1. Overall Goal/Purpose:**\n\nTo attract new users and drive sign-ups for
- a food delivery service.\n\n**2. Header:**\n\nNeeds further definition.  Should likely include the
-  company logo and potentially a concise tagline.\n\n**3. Navigation:**\n\nNeeds further definition.
-	  Based on the context,  likely navigation links should include: Home, Menu/Browse Restaurants,
-		 Sign Up/Login, About Us, Contact Us.\n\n**4. Hero Section:**\n\nNeeds further definition.
-		   Should likely include a compelling headline (e.g., "Get Your Food Delivered Fast!"),
-			  a sub-headline highlighting a key benefit (e.g., "Delicious meals delivered right to your
-				 door"), and a prominent call-to-action button (e.g., "Order Now").  A background image
-				  or video showcasing food could also be used.\n\n**5. Main Content Sections:**\n\nNo specific main content sections were described.  Based on the context of a food delivery website, potential sections could include:  A section highlighting popular restaurants or
- cuisines, a section showcasing customer testimonials, or a section explaining the ordering process.  Further definition is needed.\n\n**6. Call(s) to Action (CTA):**\n\nBesides the primary CTA in the hero section (needs further definition), other CTAs could be incorporated within the main content sections (if defined) to encourage users to explore the website or sign up.  Needs further definition.\n\n**7. Footer:**\n\nNeeds further definition.  Should likely include copyright information, contact information (email, phone number), links to privacy policy and terms of service, and potentially social media icons.\n`;
-
+const samplePrompt = `
+**Overall Goal/Purpose:** Create an informative and inviting website for "The Daily Grind" coffee shop to attract customers, showcase the menu and story, and provide contact/location details.
+**Header:** Contains the shop's logo (The Daily Grind) and the main navigation.
+**Navigation:** Links for Home, Menu, About, Contact.
+**Hero Section:** Features a large background image (latte art), a primary headline (e.g., "Welcome to The Daily Grind"), and possibly a sub-headline about the shop's vibe (modern and cozy).
+**Main Content Sections:**
+*   **Coffee Beans Origin Section:** Text explaining the source and quality of the coffee beans.
+*   **Menu Section:** Lists menu items, categorized into Espresso, Brewed Coffee, and Pastries.
+*   **Shop Story Section:** A brief text section detailing the history or mission of the coffee shop.
+*   **Location Section:** Information on finding the shop, ideally including an embedded map placeholder.
+**Call(s) to Action (CTA):** No specific CTAs mentioned beyond navigating the site. Could potentially add a "View Menu" or "Visit Us" button.
+**Footer:** Includes contact information (address, phone number), copyright notice, and links to Instagram and Facebook social media profiles.
+    `;
 function App() {
 	const [page, setPage] = useState("editor");
 	const [initialPrompt, setInitialPrompt] = useState(samplePrompt);

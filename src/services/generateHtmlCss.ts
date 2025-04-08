@@ -2,7 +2,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({
-	model: "gemini-1.5-flash-latest",
+	model: "gemini-1.5-pro-latest",
 	generationConfig: {
 		responseMimeType: "application/json",
 	},
@@ -14,88 +14,149 @@ interface GenerateHtmlCssResponse {
 }
 
 export async function generateHtmlCss(
-	refinedPrompt: string
-): Promise<GenerateHtmlCssResponse | null> {
-	if (!refinedPrompt || refinedPrompt.trim() === "") {
-		console.error("🔴 Refined prompt is empty.");
-		return null;
+	prompt: string,
+	content?: {
+		html: string;
+		css: string;
 	}
-
-	if (!genAI || !model) {
-		console.error("🔴 Gemini client not initialized properly (check API key).");
+): Promise<GenerateHtmlCssResponse | null> {
+	if (!prompt?.trim()) {
+		console.error("🔴 Prompt is empty");
 		return null;
 	}
 
 	try {
+		const hasExistingContent = content?.html;
+
+		const existingContent = hasExistingContent
+			? `**Existing Code to Modify:**\n\n` +
+			  `HTML (truncated):\n${content.html.substring(0, 1000)}${
+					content.html.length > 1000 ? "..." : ""
+			  }\n\n` +
+			  `CSS (truncated):\n${content.css.substring(0, 500)}${
+					content.css.length > 500 ? "..." : ""
+			  }\n\n` +
+			  `Modification Guidelines:\n` +
+			  `- Preserve existing class names and structure where possible\n` +
+			  `- Make minimal changes to achieve the requested modifications\n` +
+			  `- Maintain consistency with existing styles\n`
+			: "No existing content - generate from scratch";
+
 		const systemInstruction = `
-      You are an expert web developer assistant specializing in generating initial HTML and CSS for web editors like GrapesJS.
+You are an expert web developer assistant. ${
+			hasExistingContent
+				? "Modify the existing code according to the request while preserving its structure."
+				: `Generate cutting-edge, visually impressive HTML/CSS that rivals top modern websites of similar kind.`
+		}
 
-      **Task:** Convert the provided structured webpage description into a basic HTML structure and corresponding CSS stylesheet.
+**Task Requirements:**
+1. ${
+			hasExistingContent ? "Modify existing code" : "Create new code"
+		} according to: ${prompt}
+2. Output ONLY valid JSON with \`html\` and \`css\` keys
+3. Use semantic HTML5 and modern CSS
+4. ${
+			hasExistingContent
+				? "Keep existing class names where appropriate"
+				: "Add meaningful class names"
+		}
+5. Include placeholder content where needed
+6. Ensure mobile responsiveness
 
-      **Input:** A structured description of a webpage, broken down into components (like Header, Navigation, Hero Section, Main Content Sections, Footer).
+${
+	hasExistingContent
+		? "**Modification Strategy:**\n- Identify relevant sections to modify\n- Make targeted changes\n- Preserve unrelated code"
+		: "**New Code Guidelines:**\n- Logical section structure\n- Clear class naming\n- Basic responsive layout"
+}
 
-      **Output Requirements:**
-      1.  **Format:** Generate ONLY a valid JSON object. Do NOT include any text outside the JSON structure (like "Here is the JSON:" or markdown backticks).
-      2.  **JSON Structure:** The JSON object must have exactly two keys:
-          *   \`html\`: A string containing the complete HTML structure for the page.
-          *   \`css\`: A string containing CSS rules to style the HTML.
-      3.  **HTML Content:**
-          *   Use semantic HTML tags (\`header\`, \`nav\`, \`main\`, \`section\`, \`footer\`, \`h1-h6\`, \`p\`, \`ul\`, \`li\`, \`a\`, \`button\`, \`img\`).
-          *   Create distinct HTML elements/sections corresponding to the components mentioned in the input description (Header, Hero, Footer, etc.).
-          *   Use placeholder text (e.g., "[Company Name]", "[Hero Headline Here]", "[Paragraph about service]", "[Button Text]") for actual content. Do NOT invent specific wording unless it's standard like "Home", "About", "Contact".
-          *   Use placeholder image sources (e.g., \`<img src="https://via.placeholder.com/150" alt="[Placeholder Image Description]">)\`).
-          *   Assign meaningful CSS classes to elements (e.g., \`class="page-header"\`, \`class="hero-section"\`, \`class="nav-link"\`, \`class="cta-button"\`) for styling.
-      4.  **CSS Content:**
-          *   Provide basic CSS for layout (e.g., using Flexbox or Grid for major sections like header, footer, content columns), spacing (margin, padding), and minimal visual styling (e.g., basic link appearance, button style).
-          *   The CSS rules must target the classes defined in the HTML.
-          *   Keep the CSS relatively simple and clean, suitable as a starting point for GrapesJS. Avoid overly complex animations or vendor prefixes unless necessary for basic layout.
+**Design Requirements:**
+1. ${
+			hasExistingContent ? "Modify existing code" : "Create new code"
+		} according to: ${prompt}
+2. When creating from scratch, include these modern features:
+   - Hero section with gradient/animated background
+   - Interactive hover effects and smooth transitions
+   - Modern card-based layouts
+   - Clean typography with Google Fonts
+   - Responsive hamburger menu for mobile
+   - Social proof section (testimonials/client logos)
+   - Call-to-action animations
+   - Subtle shadows and depth effects
+3. Use these trending elements where appropriate:
+   - Glassmorphism effects
+   - Gradient accents
+   - Micro-interactions
+   - Responsive image grids
+   - Floating animations
+   - Neumorphic buttons
+4. Output ONLY valid JSON with \`html\` and \`css\` keys
+5. Include Font Awesome icons where appropriate
+6. Use CSS variables for colors
+7. Add subtle animations using CSS keyframes
 
-      **Input Webpage Description:**
-      ---
-      ${refinedPrompt}
-      ---
+**Examples of Modern Components:**
+${
+	hasExistingContent
+		? ""
+		: `- Sticky navigation with logo and animated underline effects
+- Full-screen hero with parallax background
+- Feature cards with 3D hover effects
+- Testimonial carousel with fade animations
+- Gradient accent borders
+- Contact form with floating labels
+- Social media hover effects`
+}
 
-      Generate the JSON output now based on these instructions and the provided description.`;
+**Color Palette (when creating new):**
+- Primary: Modern blues/purples/gradients
+- Secondary: Clean whites/light grays
+- Accent: Vibrant but professional colors
+
+**Input Details:**
+${existingContent}
+
+**Required JSON Output Format:**
+{
+  "html": "...",
+  "css": "..."
+}`;
 
 		const result = await model.generateContent(systemInstruction);
+		const response = result.response;
 
-		if (!result || !result.response || !result.response.text()) {
-			console.error("🔴 Unexpected API response:", result);
+		if (!response?.text()) {
+			console.error("🔴 Empty API response");
 			return null;
 		}
 
-		const response = result.response;
 		const responseText = response.text();
 
-		console.log("--- Gemini Raw Response Text ---");
-		console.log(responseText);
-		console.log("--------------------------------");
-
-		if (!responseText) {
-			console.error("🔴 Gemini response text is empty.");
-			if (response?.promptFeedback?.blockReason) {
-				console.error("Prompt was blocked by Gemini safety filters.");
-				console.error("Reason:", response.promptFeedback.blockReason);
-				return null;
-			}
-			return null;
-		}
+		// Improved JSON cleaning
+		const cleanResponse = responseText
+			.replace(/```json/g, "")
+			.replace(/```/g, "")
+			.replace(/\s+/g, " ")
+			.trim();
 
 		try {
-			const cleanResponse = responseText
-				.replace(/(\s*\\n\s*)/g, "")
-				.replace(/(\n)/g, "")
-				.replace("```json", "")
-				.replace("```", "");
-			console.info("cleaned up: ", cleanResponse);
 			const jsonResult: GenerateHtmlCssResponse = JSON.parse(cleanResponse);
-			return jsonResult;
-		} catch (cleanUpError) {
-			console.error("🔴 Could not cleanup response", cleanUpError);
+
+			// Basic validation
+			if (!jsonResult.html || !jsonResult.css) {
+				throw new Error("Missing html/css in response");
+			}
+
+			return {
+				html: jsonResult.html,
+				css: jsonResult.css,
+			};
+		} catch (parseError) {
+			console.error("🔴 JSON Parse Error:", parseError);
+			console.error("Original Response:", responseText);
 			return null;
 		}
 	} catch (error) {
-		console.error("🔴 Error generating refined prompt:", error);
+		console.error("🔴 API Error:", error);
 		return null;
 	}
 }

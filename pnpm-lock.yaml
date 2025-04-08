@@ -14,6 +14,9 @@ importers:
       '@grapesjs/studio-sdk':
         specifier: ^1.0.37
         version: 1.0.37(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@huggingface/inference':
+        specifier: ^3.7.0
+        version: 3.7.0
       '@radix-ui/react-dialog':
         specifier: ^1.1.6
         version: 1.1.6(@types/react-dom@19.1.1(@types/react@19.1.0))(@types/react@19.1.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -338,6 +341,17 @@ packages:
 
   '@grapesjs/studio-sdk@1.0.37':
     resolution: {integrity: sha512-zh+9fRkVExC0UzMk1f4oIH/2z7JFi/uUXeFoBGBKnRKs+qAW/X3xXgBH3v6SXZVgbX50q8Msh8claBaAcVA29A==}
+
+  '@huggingface/inference@3.7.0':
+    resolution: {integrity: sha512-9MVscLkSaRuNmcl12juT2Dk7YqGObyAuDPnSiugQnphMgG3PXmvxw7az9kVR58CKcC1sdJfBkaCbzXvhG/VynQ==}
+    engines: {node: '>=18'}
+
+  '@huggingface/jinja@0.3.3':
+    resolution: {integrity: sha512-vQQr2JyWvVFba3Lj9es4q9vCl1sAc74fdgnEMoX8qHrXtswap9ge9uO3ONDzQB0cQ0PUyaKY2N6HaVbTBvSXvw==}
+    engines: {node: '>=18'}
+
+  '@huggingface/tasks@0.18.7':
+    resolution: {integrity: sha512-ZzwifnFo4onuIs7cIzm/1G8MFZPQeMhQplG/Ru5Xnnm4TDwxrtThHfhrCZrdS8vEKpy+XBH9INoNelnWox8UQQ==}
 
   '@humanfs/core@0.19.1':
     resolution: {integrity: sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==}
@@ -2151,6 +2165,15 @@ snapshots:
     transitivePeerDependencies:
       - react
       - react-dom
+
+  '@huggingface/inference@3.7.0':
+    dependencies:
+      '@huggingface/jinja': 0.3.3
+      '@huggingface/tasks': 0.18.7
+
+  '@huggingface/jinja@0.3.3': {}
+
+  '@huggingface/tasks@0.18.7': {}
 
   '@humanfs/core@0.19.1': {}
 

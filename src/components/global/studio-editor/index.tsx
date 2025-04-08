@@ -1,13 +1,46 @@
 import StudioEditor from "@grapesjs/studio-sdk/react";
 import "@grapesjs/studio-sdk/style";
 import AiChatBox from "../ai-tools";
+import { useState, useEffect } from "react";
 
 export default function Editor({ initialPrompt }: { initialPrompt: string }) {
+	const [code, setCode] = useState({html: '', css: ''});
+	const [editor, setEditor] = useState<any>(null);
+
+	const updateContent = ({ css, html }: { html: string; css: string }) => {
+		setCode({ html, css });
+	};
+
+	useEffect(() => {
+		if (editor) {
+			try {
+				editor.setComponents(code.html);
+
+				const css = editor.Css;
+				css.clear();
+				css.addRules(code.css);
+			} catch (error) {
+				console.error("Error in use effect: ", error);
+			}
+		}
+	}, [code, editor]);
+
 	return (
 		<StudioEditor
 			className="h-screen"
 			options={{
 				licenseKey: "",
+				plugins: [
+					(editorInstance) => {
+						editorInstance.onReady(() => {
+							setEditor(editorInstance);
+
+							editorInstance.setComponents(code.html);
+							const css = editorInstance.Css;
+							css.addRules(sampleCode.css);
+						});
+					},
+				],
 				layout: {
 					default: {
 						type: "row",
@@ -19,6 +52,14 @@ export default function Editor({ initialPrompt }: { initialPrompt: string }) {
 									type: "tabs",
 									value: "blocks",
 									tabs: [
+										{
+											id: "pages",
+											label: "Pages",
+											children: {
+												type: "panelPages",
+												style: { height: "100%" },
+											},
+										},
 										{
 											id: "blocks",
 											label: "Blocks",
@@ -56,7 +97,13 @@ export default function Editor({ initialPrompt }: { initialPrompt: string }) {
 												{
 													type: "custom",
 													component: () => {
-														return <AiChatBox initialPrompt={initialPrompt} />;
+														return (
+															<AiChatBox
+																initialPrompt={initialPrompt}
+																onUpdateContent={updateContent}
+																initialContent={code}
+															/>
+														);
 													},
 													style: { height: "100%", display: "flex" },
 												},
@@ -86,11 +133,6 @@ export default function Editor({ initialPrompt }: { initialPrompt: string }) {
 								},
 							},
 						],
-					},
-				},
-				project: {
-					default: {
-						pages: [{ name: "Home", component: "<h1>Home page</h1>" }],
 					},
 				},
 			}}

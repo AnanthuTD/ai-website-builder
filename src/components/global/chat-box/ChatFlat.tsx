@@ -3,25 +3,19 @@ import AvatarPlaceHolder from "../avatar-placeholder";
 import { IChatFlat } from "@/types";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { WandSparklesIcon } from "lucide-react";
-import { generateHtmlCss } from "@/services/generateHtmlCss";
+import { Loader2, WandSparklesIcon } from "lucide-react";
 
 const ChatFlat = ({
 	chat,
 	own = false,
+	onGenerateCode = () => {},
+	isGenerating,
 }: {
 	chat: IChatFlat;
 	own?: boolean;
+	onGenerateCode: (prompt: string) => void;
+	isGenerating: boolean;
 }) => {
-	const handleGenerateCode = async (prompt: string) => {
-		if (!prompt || !prompt.trim()) return;
-
-		console.log(prompt);
-
-		const response = await generateHtmlCss(prompt);
-		console.log(response);
-	};
-
 	return (
 		<div className="flex gap-2 w-full">
 			<div className={`p-1 rounded-lg w-full`}>
@@ -48,10 +42,14 @@ const ChatFlat = ({
 										<ReactMarkdown remarkPlugins={[remarkGfm]}>
 											{chat.message as string}
 										</ReactMarkdown>
-										<Button onClick={() => handleGenerateCode(chat.message)}>
+										{chat.refinedPrompt && <Button
+											onClick={() => onGenerateCode(chat.message)}
+											disabled={isGenerating}
+										>
 											<WandSparklesIcon color="#b10abd" />
-											Refine
-										</Button>
+											Generate
+											{isGenerating && <Loader2 className="animate-spin" />}
+										</Button>}
 									</div>
 								) : (
 									// user
