@@ -2,9 +2,16 @@ import StudioEditor from "@grapesjs/studio-sdk/react";
 import "@grapesjs/studio-sdk/style";
 import AiChatBox from "../ai-tools";
 import { useState, useEffect } from "react";
+import { loadProjectData, saveProjectData } from "@/lib/storage";
 
-export default function Editor({ initialPrompt }: { initialPrompt: string }) {
-	const [code, setCode] = useState({html: '', css: ''});
+export default function Editor({
+	initialPrompt,
+	projectId = "",
+}: {
+	initialPrompt: string;
+	projectId: string;
+}) {
+	const [code, setCode] = useState({ html: "", css: "" });
 	const [editor, setEditor] = useState<any>(null);
 
 	const updateContent = ({ css, html }: { html: string; css: string }) => {
@@ -12,7 +19,7 @@ export default function Editor({ initialPrompt }: { initialPrompt: string }) {
 	};
 
 	useEffect(() => {
-		if (editor) {
+		if (editor && code.html) {
 			try {
 				editor.setComponents(code.html);
 
@@ -25,19 +32,36 @@ export default function Editor({ initialPrompt }: { initialPrompt: string }) {
 		}
 	}, [code, editor]);
 
+
 	return (
 		<StudioEditor
 			className="h-screen"
 			options={{
 				licenseKey: "",
+				storage: {
+					type: "self",
+					autosaveChanges: 5,
+
+					onSave: async ({ project }) => {
+						saveProjectData(projectId, project);
+						console.log("Project saved", { project });
+					},
+
+					onLoad: async () => {
+						const project = loadProjectData(projectId);
+						console.log("Project loaded", { project });
+
+						return {
+							project: project || {
+								pages: [{ name: "Home", component: "<h1>New project</h1>" }],
+							},
+						};
+					},
+				},
 				plugins: [
 					(editorInstance) => {
 						editorInstance.onReady(() => {
 							setEditor(editorInstance);
-
-							editorInstance.setComponents(code.html);
-							const css = editorInstance.Css;
-							css.addRules(sampleCode.css);
 						});
 					},
 				],

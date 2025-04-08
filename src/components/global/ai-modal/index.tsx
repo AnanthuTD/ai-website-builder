@@ -21,6 +21,7 @@ const AiModal = ({ onSubmitPrompt }: AiModalProps) => {
 	const [selectedTemplate, setSelectedTemplate] = useState("");
 	const [userPrompt, setUserPrompt] = useState("");
 	const [selectedLanguage, setSelectedLanguage] = useState("");
+	const [open, setOpen] = useState(false);
 
 	const handleSelectedTemplate = (template: string) => {
 		setSelectedTemplate(template);
@@ -36,17 +37,18 @@ const AiModal = ({ onSubmitPrompt }: AiModalProps) => {
 			return;
 		}
 
-		const refinedPrompt = await generateRefinePrompt(userPrompt);
+		// const refinedPrompt = await generateRefinePrompt(userPrompt);
 
-		console.log("refined prompt: ", refinedPrompt);
+		// console.log("refined prompt: ", refinedPrompt);
 
-		if (refinedPrompt.trim()) {
-			onSubmitPrompt(refinedPrompt.trim());
+		if (userPrompt.trim()) {
+			onSubmitPrompt(userPrompt.trim());
+			setOpen(false);
 		}
 	};
 
 	return (
-		<Dialog>
+		<Dialog open={open} onOpenChange={setOpen}>
 			<DialogTrigger className={""} asChild>
 				<Button variant={"default"}>
 					New Page
@@ -66,10 +68,12 @@ const AiModal = ({ onSubmitPrompt }: AiModalProps) => {
 				<TemplateSelector onSelect={handleSelectedTemplate} />
 				<AiPromptInputArea prompt={userPrompt} setPrompt={updateUserPrompt} />
 				<LanguageSelector onSelect={setSelectedLanguage} />
-				<Button onClick={handleGenerate}>
+				{/* 	<Button onClick={handleGenerate}>
 					<WandSparklesIcon color="#b10abd" />
 					Refine
-				</Button>
+				</Button> */}
+
+				<Button onClick={handleGenerate}>Submit</Button>
 			</DialogContent>
 		</Dialog>
 	);
