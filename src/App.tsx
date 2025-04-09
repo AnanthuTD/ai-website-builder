@@ -18,7 +18,7 @@ const sampleData = {
 	},
 	language: "en",
 	template: "Portfolio",
-	projectId: 'e7e70af5-4ea1-4e87-9b67-fd3e525a3a35'
+	projectId: "e7e70af5-4ea1-4e87-9b67-fd3e525a3a35",
 };
 
 function App() {
@@ -53,15 +53,15 @@ function App() {
 	};
 
 	return (
-		<div className="min-h-screen flex flex-col">
-			<nav className="bg-gray-800 text-white p-4 flex justify-between items-center">
-				<div className="text-lg font-bold">Website Builder</div>
+		<div className="min-h-screen flex flex-col bg-white">
+			<nav className="bg-white text-gray-900 p-4 flex justify-between items-center border-b border-gray-200 shadow-sm">
+				<div className="text-lg font-semibold">Website Builder</div>
 				<div className="space-x-4">
 					<button
-						className={`px-3 py-1 rounded ${
+						className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
 							page === "dashboard"
-								? "bg-blue-500"
-								: "bg-gray-600 hover:bg-gray-500"
+								? "bg-[hsl(238,87%,67%)] text-white"
+								: "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
 						}`}
 						onClick={() => {
 							saveSelectedProjectId("");

@@ -81,41 +81,53 @@ function Dashboard({ onSubmit }: DashboardProps) {
 	};
 
 	return (
-		<section className="flex flex-1">
-			<section id="side-bar" className="h-screen w-1/4 bg-gray-100 p-4">
-				Sidebar
-			</section>
-			<div className="flex flex-col w-full p-5">
-				<div className="flex justify-between items-center">
+		<section className="flex flex-1 bg-white min-h-screen">
+			<div className="flex flex-col w-full p-8">
+				{/* Header Section */}
+				<div className="flex justify-between items-center mb-10 border-b border-gray-200 pb-4">
 					<div>
-						<h2 className="text-2xl">Website Builder Dashboard</h2>
-						<h4>Here you can create new pages.</h4>
+						<h2 className="text-2xl font-semibold text-gray-900">
+							Website Builder
+						</h2>
+						<h4 className="text-gray-500 text-sm mt-1">Project Dashboard</h4>
 					</div>
-					<div className="space-x-2">
+					<div className="space-x-4">
 						{/* Create New Project */}
 						<AiModal onSubmit={handleSubmit} />
 
-						{/* delete all projects */}
+						{/* Delete All Projects */}
 						<Dialog open={openDeleteAll} onOpenChange={setOpenDeleteAll}>
 							<DialogTrigger asChild>
-								<Button variant="destructive">Delete All</Button>
+								<Button
+									variant="ghost"
+									className="text-red-500 hover:text-red-600 hover:bg-gray-100 transition-colors"
+								>
+									Delete All
+								</Button>
 							</DialogTrigger>
-							<DialogContent>
+							<DialogContent className="bg-white border border-gray-200 text-gray-900">
 								<DialogHeader>
-									<DialogTitle>Are you sure?</DialogTitle>
-									<DialogDescription>
-										This will delete all projects permanently. This action
-										cannot be undone.
+									<DialogTitle className="text-gray-900">
+										Delete All Projects?
+									</DialogTitle>
+									<DialogDescription className="text-gray-500">
+										This action will permanently remove all projects and cannot
+										be undone.
 									</DialogDescription>
 								</DialogHeader>
 								<DialogFooter>
 									<Button
-										variant="outline"
+										variant="ghost"
 										onClick={() => setOpenDeleteAll(false)}
+										className="text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors"
 									>
 										Cancel
 									</Button>
-									<Button variant="destructive" onClick={handleDeleteAll}>
+									<Button
+										variant="ghost"
+										onClick={handleDeleteAll}
+										className="text-red-500 hover:text-red-600 hover:bg-gray-100 transition-colors"
+									>
 										Delete All
 									</Button>
 								</DialogFooter>
@@ -124,16 +136,24 @@ function Dashboard({ onSubmit }: DashboardProps) {
 					</div>
 				</div>
 
-				{projects && projects.length ? (
-					<ProjectTable
-						onSelect={handleProjectSelect}
-						projects={projects}
-						onDelete={handleDelete}
-						onRename={handleRename}
-					/>
-				) : (
-					"No Projects"
-				)}
+				{/* Projects Section */}
+				<div className="bg-white">
+					{projects && projects.length ? (
+						<ProjectTable
+							onSelect={handleProjectSelect}
+							projects={projects}
+							onDelete={handleDelete}
+							onRename={handleRename}
+						/>
+					) : (
+						<div className="text-center py-16">
+							<p className="text-gray-600 text-base">No projects yet</p>
+							<p className="text-gray-400 text-sm mt-1">
+								Start by creating a new project
+							</p>
+						</div>
+					)}
+				</div>
 			</div>
 		</section>
 	);
