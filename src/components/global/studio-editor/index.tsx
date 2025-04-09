@@ -29,7 +29,7 @@ export default function Editor({ data }: { data: SubmitData }) {
 	useEffect(() => {
 		const link = document.createElement("link");
 		link.rel = "stylesheet";
-		link.href = "../../../../node_modules/@grapesjs/studio-sdk/dist/style.css";
+		link.href = "/styles/style.css";
 		document.head.appendChild(link);
 
 		return () => {
