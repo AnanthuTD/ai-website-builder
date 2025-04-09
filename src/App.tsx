@@ -7,7 +7,7 @@ import { Toaster } from "./components/ui/sonner";
 
 function App() {
 	const [page, setPage] = useState(() => {
-		return localStorage.getItem("selectedPage") || "editor";
+		return localStorage.getItem("selectedPage") || "dashboard";
 	});
 	const [data, setData] = useState<SubmitData | null>({
 		projectId: loadSelectedProjectId(),
