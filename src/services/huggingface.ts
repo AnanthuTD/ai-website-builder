@@ -12,14 +12,14 @@ export async function generateHtmlCssWithHuggingFace(
 		html: string;
 		css: string;
 	},
-	language: string = "English", // Default language
+	language: string = "English",
 	colors: Colors = {
-		primary: "#6B4E31", // Coffee brown
-		secondary: "#D4A373", // Light coffee
-		background: "#F5F1ED", // Cream
-		text: "#3C2F2F", // Dark coffee
-		neutral: "#EDE4E0", // Light neutral
-		accent: "#A67B5B", // Medium coffee accent
+		primary: "",
+		secondary: "", 
+		background: "", 
+		text: "", 
+		neutral: "", 
+		accent: "", 
 	}
 ): Promise<GenerateHtmlCssResponse | null> {
 	if (!prompt?.trim()) {
@@ -58,15 +58,15 @@ You are a web developer creating a small, beautiful webpage. ${
 **Guidelines:**
 - Use Poppins font (Google Fonts)
 - Language: All text content should be in ${language}
-- Colors (use these, falling back to defaults if empty):
-  - Primary: ${colors.primary || "#6B4E31"} (e.g., buttons, headers)
+- Colors: Use these if provided; otherwise, choose colors that complements the purpose of the page:
+  - Primary: ${colors?.primary || "choose"} (e.g., buttons, headers)
   - Secondary: ${
-		colors.secondary || "#D4A373"
+		colors?.secondary || "choose"
 	} (e.g., highlights, secondary buttons)
-  - Background: ${colors.background || "#F5F1ED"} (e.g., page background)
-  - Text: ${colors.text || "#3C2F2F"} (e.g., body text)
-  - Neutral: ${colors.neutral || "#EDE4E0"} (e.g., borders, subtle backgrounds)
-  - Accent: ${colors.accent || "#A67B5B"} (e.g., small highlights)
+  - Background: ${colors?.background || "choose"} (e.g., page background)
+  - Text: ${colors?.text || "choose"} (e.g., body text)
+  - Neutral: ${colors?.neutral || "choose"} (e.g., borders, subtle backgrounds)
+  - Accent: ${colors?.accent || "choose"} (e.g., small highlights)
 - Minimal transitions
 - Keep code concise
 

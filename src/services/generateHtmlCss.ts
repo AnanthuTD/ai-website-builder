@@ -21,14 +21,14 @@ export async function generateHtmlCss(
 		css: string;
 	},
 	language: string = "English", // Default language
-	colors: Colors = {
+	colors: Colors = ({
 		primary: "", // Coffee brown
 		secondary: "", // Light coffee
 		background: "", // Cream
 		text: "", // Dark coffee
 		neutral: "", // Light neutral
 		accent: "", // Medium coffee accent
-	}
+	})
 ): Promise<GenerateHtmlCssResponse | null> {
 	if (!prompt?.trim()) {
 		console.error("🔴 Prompt is empty");
@@ -65,12 +65,14 @@ You are a web developer creating a small, beautiful webpage. ${
 - Use Poppins font (Google Fonts)
 - Language: All text content should be in ${language}
 - Colors: Use these if provided; otherwise, choose colors that complements the purpose of the page:
-  - Primary: ${colors.primary || "choose"} (e.g., buttons, headers)
-  - Secondary: ${colors.secondary || "choose"} (e.g., highlights, secondary buttons)
-  - Background: ${colors.background || "choose"} (e.g., page background)
-  - Text: ${colors.text || "choose"} (e.g., body text)
-  - Neutral: ${colors.neutral || "choose"} (e.g., borders, subtle backgrounds)
-  - Accent: ${colors.accent || "choose"} (e.g., small highlights)
+  - Primary: ${colors?.primary || "choose"} (e.g., buttons, headers)
+  - Secondary: ${
+		colors?.secondary || "choose"
+	} (e.g., highlights, secondary buttons)
+  - Background: ${colors?.background || "choose"} (e.g., page background)
+  - Text: ${colors?.text || "choose"} (e.g., body text)
+  - Neutral: ${colors?.neutral || "choose"} (e.g., borders, subtle backgrounds)
+  - Accent: ${colors?.accent || "choose"} (e.g., small highlights)
 - Minimal transitions
 - Keep code concise
 
