@@ -3,6 +3,7 @@ import "./App.css";
 import Editor from "./components/global/studio-editor";
 import Dashboard from "./components/global/dashboard";
 import { loadSelectedProjectId } from "./lib/storage";
+import { Toaster } from "./components/ui/sonner";
 
 function App() {
 	const [page, setPage] = useState(() => {
@@ -31,6 +32,8 @@ function App() {
 
 	return (
 		<div className="min-h-screen flex flex-col">
+			<Toaster />
+
 			{/* Navigation Bar */}
 			<nav className="bg-gray-800 text-white p-4 flex justify-between items-center">
 				<div className="text-lg font-bold">Website Builder</div>

@@ -9,17 +9,21 @@ import ChatFlat from "../chat-box/ChatFlat";
 import { generateRefinePrompt } from "@/services/generateRefinePrompt";
 import { toast } from "sonner";
 import { generateHtmlCssWithHuggingFace } from "@/services/huggingface";
+import { convertToBlocks } from "@/services/convertToBlocks";
+import { Block } from "../studio-editor";
 
 interface Props {
 	initialPrompt: string;
 	onUpdateContent: ({ css, html }: { html: string; css: string }) => void;
 	initialContent?: { html: string; css: string };
+	updateAiGeneratedBlock: (blocks: Block[]) => void;
 }
 
 const AiChatBox = ({
 	initialPrompt = "",
 	onUpdateContent,
 	initialContent = { css: "", html: "" },
+	updateAiGeneratedBlock,
 }: Props) => {
 	const userId = "userId";
 	const [chats, setChats] = useState<IChatFlat[]>([]);
@@ -27,6 +31,20 @@ const AiChatBox = ({
 	const [isGenerating, setIsGenerating] = useState(false);
 	const chatContainerRef = useRef<HTMLDivElement>(null);
 	const [content, setContent] = useState(initialContent);
+
+	const handleGenerateBlocks = async () => {
+		if (!initialContent.html) return;
+
+		const blocks = await convertToBlocks(initialContent);
+		console.log(blocks);
+
+		if (!blocks) {
+			toast.error("No blocks were returned by the AI!");
+			return;
+		}
+
+		updateAiGeneratedBlock(blocks);
+	};
 
 	useEffect(() => {
 		if (chatContainerRef.current) {
@@ -142,6 +160,7 @@ const AiChatBox = ({
 	return (
 		<div className="rounded-xl grow flex flex-col gap-y-2 p-3 min-h-full justify-between bg-gray-50">
 			<div className="flex justify-between items-center">
+				<button onClick={handleGenerateBlocks}>Generate blocks</button>
 				<h3 className="text-lg font-semibold">Design Assistant</h3>
 			</div>
 
