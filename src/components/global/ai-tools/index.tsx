@@ -15,6 +15,13 @@ import { Colors } from "../ai-modal";
 import { generateHtmlCss } from "@/services/generateHtmlCss";
 import Loader from "../loader";
 import { Badge } from "@/components/ui/badge";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
 
 interface Props {
 	initialPrompt: string;
@@ -42,6 +49,9 @@ const AiChatBox = ({
 	const [isGenerating, setIsGenerating] = useState(false);
 	const chatContainerRef = useRef<HTMLDivElement>(null);
 	const [content, setContent] = useState(initialContent);
+	const [selectedModel, setSelectedModel] = useState<"gimini" | "deepseek">(
+		"gimini"
+	);
 
 	const handleGenerateBlocks = async () => {
 		if (!initialContent.html) return;
@@ -93,8 +103,11 @@ const AiChatBox = ({
 
 		setIsGenerating(true);
 		try {
-			// const response = await generateHtmlCssWithHuggingFace(prompt, content, language, colors);
-			const response = await generateHtmlCss(prompt, content, language, colors);
+			const generateContent =
+				selectedModel === "gimini"
+					? generateHtmlCss
+					: generateHtmlCssWithHuggingFace;
+			const response = await generateContent(prompt, content, language, colors);
 			console.log("ai generated: ", response);
 			if (response?.html) {
 				setContent(response);
@@ -209,19 +222,36 @@ const AiChatBox = ({
 				</div>
 			)}
 
-			<Badge
-				onClick={() => {
-					if (!(isGenerating || !initialContent.html)) handleGenerateBlocks();
-				}}
-				variant="outline"
-				className={`bottom-15 bg-gray-500 text-white hover:bg-gray-600 border-none ${
-					!(isGenerating || !initialContent.html)
-						? "hover:cursor-pointer"
-						: "hover:cursor-not-allowed"
-				}`}
-			>
-				Generate Blocks (AI)
-			</Badge>
+			<div className="flex items-center gap-2">
+				<Badge
+					onClick={() => {
+						if (!(isGenerating || !initialContent.html)) handleGenerateBlocks();
+					}}
+					variant="outline"
+					className={`bottom-15 bg-gray-500 text-white hover:bg-gray-600 border-none ${
+						!(isGenerating || !initialContent.html)
+							? "hover:cursor-pointer"
+							: "hover:cursor-not-allowed"
+					}`}
+				>
+					Generate Blocks (AI)
+				</Badge>
+				<Select
+					value={selectedModel}
+					onValueChange={(value: "gimini" | "deepseek") =>
+						setSelectedModel(value)
+					}
+				>
+					<SelectTrigger className="w-[100px] bg-gray-700 text-white outline-1 outline-gray-500">
+						<SelectValue className="bg-gray-500" placeholder="Select Model" />
+					</SelectTrigger>
+					<SelectContent className="bg-gray-700 text-white border-none">
+						<SelectItem value="gimini">Gimini</SelectItem>
+						<SelectItem value="deepseek">Deepseek</SelectItem>
+					</SelectContent>
+				</Select>
+			</div>
+
 			<div className="flex gap-2 items-end">
 				<div className="flex-grow">
 					<Textarea
