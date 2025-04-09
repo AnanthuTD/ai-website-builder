@@ -83,7 +83,7 @@ const AiModal = ({ onSubmit }: AiModalProps) => {
 					<PlusSquareIcon />
 				</Button>
 			</DialogTrigger>
-			<DialogContent>
+			<DialogContent className="min-w-3/5">
 				<DialogHeader>
 					<DialogTitle>
 						Describe what you want the page to look like.
