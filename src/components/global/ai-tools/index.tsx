@@ -224,7 +224,7 @@ const AiChatBox = ({
           }}
           variant="outline"
           className={`bg-gray-500 text-white hover:bg-gray-600 border-none ${
-            !(isGenerating || !initialContent.html)
+            !(isGenerating || !content.html)
               ? "hover:cursor-pointer"
               : "hover:cursor-not-allowed"
           }`}
