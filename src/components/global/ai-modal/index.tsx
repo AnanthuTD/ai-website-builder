@@ -9,10 +9,12 @@ import {
 } from "@/components/ui/dialog";
 import { PlusSquareIcon } from "lucide-react";
 import { TemplateSelector } from "../template-selector";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { AiPromptInputArea } from "../prompt-text-box";
 import { LanguageSelector } from "../language-selector";
 import ColorSelector from "../color-selector";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 export interface Colors {
 	primary: string;
@@ -45,6 +47,7 @@ const AiModal = ({ onSubmit }: AiModalProps) => {
 		secondary: "",
 		text: "",
 	});
+	const nameRef = useRef<HTMLInputElement | null>(null)
 
 	const handleSelectedTemplate = (template: string) => {
 		setSelectedTemplate(template);
@@ -66,6 +69,7 @@ const AiModal = ({ onSubmit }: AiModalProps) => {
 				colors,
 				language: selectedLanguage,
 				template: selectedTemplate,
+				projectName: nameRef?.current?.value ?? ""
 			});
 			setOpen(false);
 		}
@@ -89,6 +93,9 @@ const AiModal = ({ onSubmit }: AiModalProps) => {
 						modification later.
 					</DialogDescription>
 				</DialogHeader>
+
+				<Label>Project Name: </Label>
+				<Input ref={nameRef} />
 
 				{/* template selector */}
 				<TemplateSelector onSelect={handleSelectedTemplate} />

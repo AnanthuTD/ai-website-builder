@@ -23,6 +23,7 @@ export type SubmitData = {
 	colors?: Colors;
 	template?: string;
 	projectId?: string;
+	projectName?: string;
 };
 
 interface DashboardProps {
@@ -41,12 +42,15 @@ function Dashboard({ onSubmit }: DashboardProps) {
 	const [openDeleteAll, setOpenDeleteAll] = useState(false);
 
 	const handleSubmit = (data: SubmitData) => {
-		const newProject = { id: crypto.randomUUID(), name: "Untitled Project" };
+		const newProject = {
+			id: crypto.randomUUID(),
+			name: data.projectName || "Untitled Project",
+		};
 		const newProjects = [newProject, ...projects];
 
 		saveProjectsList(newProjects);
 		setProjects(newProjects);
-		onSubmit(data);
+		onSubmit({ ...data, projectId: newProject.id });
 	};
 
 	const handleDelete = (projectId: string) => {
@@ -88,7 +92,10 @@ function Dashboard({ onSubmit }: DashboardProps) {
 						<h4>Here you can create new pages.</h4>
 					</div>
 					<div className="space-x-2">
+						{/* Create New Project */}
 						<AiModal onSubmit={handleSubmit} />
+
+						{/* delete all projects */}
 						<Dialog open={openDeleteAll} onOpenChange={setOpenDeleteAll}>
 							<DialogTrigger asChild>
 								<Button variant="destructive">Delete All</Button>

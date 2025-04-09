@@ -37,8 +37,10 @@ export default function Editor({ data }: { data: SubmitData }) {
 		};
 	}, []);
 
-	const updatePage = (content: Content) => {
+	const updatePage = (editor: any, content: Content) => {
+		console.log("Content update: ", content);
 		if (editor) {
+			console.log("editor instance found");
 			try {
 				editor.setComponents(content.html);
 
@@ -48,16 +50,26 @@ export default function Editor({ data }: { data: SubmitData }) {
 			} catch (error) {
 				console.error("Error in use effect: ", error);
 			}
+		} else {
+			toast.error("Editor instance not found!");
+			console.error("Editor instance not found!");
 		}
 	};
 
 	const getPageContent = (editorInstance: any) => {
-		if (!editorInstance.getHtml && data.template) {
-			const tem = sampleTemplates[data.template];
-			return {
-				html: tem.html || "",
-				css: tem.css || "",
-			};
+		if (!loadProjectData(projectId)) {
+			if (data.template) {
+				const tem = sampleTemplates[data.template];
+				return {
+					html: tem.html || "",
+					css: tem.css || "",
+				};
+			} else {
+				return {
+					html: "",
+					css: "",
+				};
+			}
 		}
 		return {
 			html: editorInstance?.getHtml() || "",
@@ -120,6 +132,7 @@ export default function Editor({ data }: { data: SubmitData }) {
 				plugins: [
 					(editorInstance) => {
 						editorInstance.onReady(() => {
+							console.log("editor instance loaded");
 							setEditor(editorInstance);
 
 							const blocks = loadProjectBlocksData(projectId);
@@ -188,11 +201,14 @@ export default function Editor({ data }: { data: SubmitData }) {
 																initialPrompt={data?.prompt ?? ""}
 																language={data.language ?? ""}
 																colors={data.colors ?? null}
-																onUpdateContent={updatePage}
+																onUpdateContent={(content) =>
+																	updatePage(editor, content)
+																}
 																initialContent={getPageContent(editor)}
 																updateAiGeneratedBlock={(blocks) =>
 																	updateAiGeneratedBlock(editor, blocks)
 																}
+																firstTime={!loadProjectData(projectId)}
 															/>
 														);
 													},

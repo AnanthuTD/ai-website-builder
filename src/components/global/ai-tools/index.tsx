@@ -13,6 +13,8 @@ import { convertToBlocks } from "@/services/convertToBlocks";
 import { Block } from "../studio-editor";
 import { Colors } from "../ai-modal";
 import { generateHtmlCss } from "@/services/generateHtmlCss";
+import Loader from "../loader";
+import { Badge } from "@/components/ui/badge";
 
 interface Props {
 	initialPrompt: string;
@@ -21,6 +23,7 @@ interface Props {
 	updateAiGeneratedBlock: (blocks: Block[]) => void;
 	language: string;
 	colors: Colors | null;
+	firstTime: boolean;
 }
 
 const AiChatBox = ({
@@ -30,7 +33,9 @@ const AiChatBox = ({
 	updateAiGeneratedBlock,
 	colors,
 	language,
+	firstTime = true,
 }: Props) => {
+	console.log("initialContent: ", initialContent);
 	const userId = "userId";
 	const [chats, setChats] = useState<IChatFlat[]>([]);
 	const [message, setMessage] = useState("");
@@ -41,6 +46,8 @@ const AiChatBox = ({
 	const handleGenerateBlocks = async () => {
 		if (!initialContent.html) return;
 
+		setIsGenerating(true);
+
 		const blocks = await convertToBlocks(initialContent);
 		console.log(blocks);
 
@@ -50,6 +57,8 @@ const AiChatBox = ({
 		}
 
 		updateAiGeneratedBlock(blocks);
+
+		setIsGenerating(false);
 	};
 
 	useEffect(() => {
@@ -60,6 +69,8 @@ const AiChatBox = ({
 	}, [chats]);
 
 	useEffect(() => {
+		if (!firstTime) return;
+
 		if (initialPrompt.trim()) {
 			const aiMessage = {
 				id: crypto.randomUUID(),
@@ -73,7 +84,7 @@ const AiChatBox = ({
 				userId: userId,
 			};
 			setChats([userMessage, aiMessage]);
-			// handleSendMessage(initialPrompt);
+			handleSendMessage(initialPrompt);
 		}
 	}, [initialPrompt]);
 
@@ -84,6 +95,7 @@ const AiChatBox = ({
 		try {
 			// const response = await generateHtmlCssWithHuggingFace(prompt, content, language, colors);
 			const response = await generateHtmlCss(prompt, content, language, colors);
+			console.log("ai generated: ", response);
 			if (response?.html) {
 				setContent(response);
 				onUpdateContent(response);
@@ -146,7 +158,6 @@ const AiChatBox = ({
 					},
 				]);
 			} else {
-				// modifying already existing content
 				handleGenerateCode(prompt);
 			}
 		} catch (error) {
@@ -165,9 +176,8 @@ const AiChatBox = ({
 	};
 
 	return (
-		<div className="rounded-xl grow flex flex-col gap-y-2 p-3 min-h-full justify-between bg-gray-50">
+		<div className="rounded-xl grow flex flex-col gap-y-2 p-3 min-h-full justify-between text-white">
 			<div className="flex justify-between items-center">
-				<button onClick={handleGenerateBlocks}>Generate blocks</button>
 				<h3 className="text-lg font-semibold">Design Assistant</h3>
 			</div>
 
@@ -176,26 +186,48 @@ const AiChatBox = ({
 				className="flex flex-col gap-y-2 px-1 flex-grow overflow-y-auto scrollbar-thin scrollbar-thumb-indigo-300 scrollbar-track-indigo-100"
 			>
 				{chats.map((chat) => (
-					<ChatFlat
-						onGenerateCode={handleGenerateCode}
-						chat={chat}
-						key={chat.id}
-						own={chat.userId === userId}
-						isGenerating={
-							isGenerating &&
-							chat.userId === "ai" &&
-							chat.id === chats[chats.length - 1]?.id
-						}
-					/>
+					<>
+						<ChatFlat
+							onGenerateCode={handleGenerateCode}
+							chat={chat}
+							key={chat.id}
+							own={chat.userId === userId}
+							isGenerating={
+								isGenerating &&
+								chat.userId === "ai" &&
+								chat.id === chats[chats.length - 1]?.id
+							}
+						/>
+					</>
 				))}
 			</div>
 
+			{isGenerating && (
+				<div className="flex gap-2 items-center">
+					<Loader state={isGenerating} className="self-baseline" />
+					Generating ...
+				</div>
+			)}
+
+			<Badge
+				onClick={() => {
+					if (!(isGenerating || !initialContent.html)) handleGenerateBlocks();
+				}}
+				variant="outline"
+				className={`bottom-15 bg-gray-500 text-white hover:bg-gray-600 border-none ${
+					!(isGenerating || !initialContent.html)
+						? "hover:cursor-pointer"
+						: "hover:cursor-not-allowed"
+				}`}
+			>
+				Generate Blocks (AI)
+			</Badge>
 			<div className="flex gap-2 items-end">
 				<div className="flex-grow">
 					<Textarea
 						value={message}
 						rows={1}
-						className="bg-white focus-visible:ring-indigo-300 resize-none"
+						className="bg-white focus-visible:ring-indigo-300 resize-none pr-24"
 						onChange={(e) => setMessage(e.target.value)}
 						onKeyDown={handleKeyDown}
 						placeholder="Type your message..."

@@ -5,9 +5,25 @@ import Dashboard, { SubmitData } from "./components/global/dashboard";
 import { loadSelectedProjectId, saveSelectedProjectId } from "./lib/storage";
 import { Toaster } from "./components/ui/sonner";
 
+const sampleData = {
+	prompt:
+		"My name is ananthu td. the portfolio should contain a section to list my projects as well along with all other sections. I am a MERN stack developer.",
+	colors: {
+		accent: "",
+		background: "",
+		neutral: "",
+		primary: "#00ffe4",
+		secondary: "",
+		text: "",
+	},
+	language: "en",
+	template: "Portfolio",
+	projectId: 'e7e70af5-4ea1-4e87-9b67-fd3e525a3a35'
+};
+
 function App() {
 	const [page, setPage] = useState(() => {
-		return localStorage.getItem("selectedPage") || "dashboard";
+		return localStorage.getItem("selectedPage") || "editor";
 	});
 	const [data, setData] = useState<SubmitData | null>({
 		projectId: loadSelectedProjectId(),
@@ -32,6 +48,7 @@ function App() {
 	}, [data]);
 
 	const handleSubmit = (data: SubmitData) => {
+		console.log("submitted: ", data);
 		if (data.projectId) setData(data);
 	};
 
@@ -47,7 +64,7 @@ function App() {
 								: "bg-gray-600 hover:bg-gray-500"
 						}`}
 						onClick={() => {
-							saveSelectedProjectId('')
+							saveSelectedProjectId("");
 							handlePageChange("dashboard");
 						}}
 					>
