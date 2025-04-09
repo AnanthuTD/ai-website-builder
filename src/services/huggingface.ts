@@ -1,3 +1,4 @@
+import { Colors } from "@/components/global/ai-modal";
 import { HfInference } from "@huggingface/inference";
 
 interface GenerateHtmlCssResponse {
@@ -10,6 +11,15 @@ export async function generateHtmlCssWithHuggingFace(
 	content?: {
 		html: string;
 		css: string;
+	},
+	language: string = "English", // Default language
+	colors: Colors = {
+		primary: "#6B4E31", // Coffee brown
+		secondary: "#D4A373", // Light coffee
+		background: "#F5F1ED", // Cream
+		text: "#3C2F2F", // Dark coffee
+		neutral: "#EDE4E0", // Light neutral
+		accent: "#A67B5B", // Medium coffee accent
 	}
 ): Promise<GenerateHtmlCssResponse | null> {
 	if (!prompt?.trim()) {
@@ -47,7 +57,16 @@ You are a web developer creating a small, beautiful webpage. ${
 
 **Guidelines:**
 - Use Poppins font (Google Fonts)
-- Subtle coffee-inspired colors (e.g., browns, creams)
+- Language: All text content should be in ${language}
+- Colors (use these, falling back to defaults if empty):
+  - Primary: ${colors.primary || "#6B4E31"} (e.g., buttons, headers)
+  - Secondary: ${
+		colors.secondary || "#D4A373"
+	} (e.g., highlights, secondary buttons)
+  - Background: ${colors.background || "#F5F1ED"} (e.g., page background)
+  - Text: ${colors.text || "#3C2F2F"} (e.g., body text)
+  - Neutral: ${colors.neutral || "#EDE4E0"} (e.g., borders, subtle backgrounds)
+  - Accent: ${colors.accent || "#A67B5B"} (e.g., small highlights)
 - Minimal transitions
 - Keep code concise
 

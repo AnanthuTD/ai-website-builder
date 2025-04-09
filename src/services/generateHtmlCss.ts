@@ -1,8 +1,9 @@
+import { Colors } from "@/components/global/ai-modal";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({
-	model: "gemini-1.5-pro-latest",
+	model: "gemini-1.5-flash-latest",
 	generationConfig: {
 		responseMimeType: "application/json",
 	},
@@ -18,6 +19,15 @@ export async function generateHtmlCss(
 	content?: {
 		html: string;
 		css: string;
+	},
+	language: string = "English", // Default language
+	colors: Colors = {
+		primary: "#6B4E31", // Coffee brown
+		secondary: "#D4A373", // Light coffee
+		background: "#F5F1ED", // Cream
+		text: "#3C2F2F", // Dark coffee
+		neutral: "#EDE4E0", // Light neutral
+		accent: "#A67B5B", // Medium coffee accent
 	}
 ): Promise<GenerateHtmlCssResponse | null> {
 	if (!prompt?.trim()) {
@@ -29,97 +39,50 @@ export async function generateHtmlCss(
 		const hasExistingContent = content?.html;
 
 		const existingContent = hasExistingContent
-			? `**Existing Code to Modify:**\n\n` +
-			  `HTML (truncated):\n${content.html.substring(0, 1000)}${
-					content.html.length > 1000 ? "..." : ""
-			  }\n\n` +
-			  `CSS (truncated):\n${content.css.substring(0, 500)}${
-					content.css.length > 500 ? "..." : ""
-			  }\n\n` +
-			  `Modification Guidelines:\n` +
-			  `- Preserve existing class names and structure where possible\n` +
-			  `- Make minimal changes to achieve the requested modifications\n` +
-			  `- Maintain consistency with existing styles\n`
+			? `**Existing Code:**\nHTML:\n${content.html}\nCSS:\n${content.css}`
 			: "No existing content - generate from scratch";
 
 		const systemInstruction = `
-You are an expert web developer assistant. ${
+You are a web developer creating a small, beautiful webpage. ${
 			hasExistingContent
-				? "Modify the existing code according to the request while preserving its structure."
-				: `Generate cutting-edge, visually impressive HTML/CSS that rivals top modern websites of similar kind.`
+				? "Modify the existing code minimally per the prompt. Return the full modified HTML and CSS."
+				: "Generate a small, elegant webpage for: " + prompt
 		}
 
-**Task Requirements:**
+**Requirements:**
 1. ${
-			hasExistingContent ? "Modify existing code" : "Create new code"
-		} according to: ${prompt}
+			hasExistingContent
+				? "Modify per: " + prompt + ". Keep unchanged parts intact."
+				: "Create per: " + prompt
+		}
 2. Output ONLY valid JSON with \`html\` and \`css\` keys
 3. Use semantic HTML5 and modern CSS
-4. ${
-			hasExistingContent
-				? "Keep existing class names where appropriate"
-				: "Add meaningful class names"
-		}
-5. Include placeholder content where needed
-6. Ensure mobile responsiveness
+4. Keep it small: header, hero, one content section, footer with newsletter
+5. Ensure mobile responsiveness
+6. Design: simple, elegant, beautiful, no complex animations
 
-${
-	hasExistingContent
-		? "**Modification Strategy:**\n- Identify relevant sections to modify\n- Make targeted changes\n- Preserve unrelated code"
-		: "**New Code Guidelines:**\n- Logical section structure\n- Clear class naming\n- Basic responsive layout"
-}
+**Guidelines:**
+- Use Poppins font (Google Fonts)
+- Language: All text content should be in ${language}
+- Colors (use these, falling back to defaults if empty):
+  - Primary: ${colors.primary || "#6B4E31"} (e.g., buttons, headers)
+  - Secondary: ${
+		colors.secondary || "#D4A373"
+	} (e.g., highlights, secondary buttons)
+  - Background: ${colors.background || "#F5F1ED"} (e.g., page background)
+  - Text: ${colors.text || "#3C2F2F"} (e.g., body text)
+  - Neutral: ${colors.neutral || "#EDE4E0"} (e.g., borders, subtle backgrounds)
+  - Accent: ${colors.accent || "#A67B5B"} (e.g., small highlights)
+- Minimal transitions
+- Keep code concise
 
-**Design Requirements:**
-1. ${
-			hasExistingContent ? "Modify existing code" : "Create new code"
-		} according to: ${prompt}
-2. When creating from scratch, include these modern features:
-   - Hero section with gradient/animated background
-   - Interactive hover effects and smooth transitions
-   - Modern card-based layouts
-   - Clean typography with Google Fonts
-   - Responsive hamburger menu for mobile
-   - Social proof section (testimonials/client logos)
-   - Call-to-action animations
-   - Subtle shadows and depth effects
-3. Use these trending elements where appropriate:
-   - Glassmorphism effects
-   - Gradient accents
-   - Micro-interactions
-   - Responsive image grids
-   - Floating animations
-   - Neumorphic buttons
-4. Output ONLY valid JSON with \`html\` and \`css\` keys
-5. Include Font Awesome icons where appropriate
-6. Use CSS variables for colors
-7. Add subtle animations using CSS keyframes
-
-**Examples of Modern Components:**
-${
-	hasExistingContent
-		? ""
-		: `- Sticky navigation with logo and animated underline effects
-- Full-screen hero with parallax background
-- Feature cards with 3D hover effects
-- Testimonial carousel with fade animations
-- Gradient accent borders
-- Contact form with floating labels
-- Social media hover effects`
-}
-
-**Color Palette (when creating new):**
-- Primary: Modern blues/purples/gradients
-- Secondary: Clean whites/light grays
-- Accent: Vibrant but professional colors
-
-**Input Details:**
+**Input:**
 ${existingContent}
 
-**Required JSON Output Format:**
-{
-  "html": "...",
-  "css": "..."
-}`;
+**Output:**
+{"html": "...", "css": "..."}
+**Note:** Return only the raw JSON, no extra text.
+`;
 
 		const result = await model.generateContent(systemInstruction);
 		const response = result.response;

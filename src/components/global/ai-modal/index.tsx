@@ -7,21 +7,44 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/dialog";
-import { PlusSquareIcon, WandSparklesIcon } from "lucide-react";
+import { PlusSquareIcon } from "lucide-react";
 import { TemplateSelector } from "../template-selector";
 import { useState } from "react";
 import { AiPromptInputArea } from "../prompt-text-box";
 import { LanguageSelector } from "../language-selector";
-import { generateRefinePrompt } from "@/services/generateRefinePrompt";
+import ColorSelector from "../color-selector";
+
+export interface Colors {
+	primary: string;
+	secondary: string;
+	background: string;
+	text: string;
+	neutral: string;
+	accent: string;
+}
 
 interface AiModalProps {
-	onSubmitPrompt: (prompt: string) => void;
+	onSubmit: (data: {
+		prompt: string;
+		language: string;
+		template: string;
+		colors: Colors;
+	}) => void;
 }
-const AiModal = ({ onSubmitPrompt }: AiModalProps) => {
+
+const AiModal = ({ onSubmit }: AiModalProps) => {
 	const [selectedTemplate, setSelectedTemplate] = useState("");
 	const [userPrompt, setUserPrompt] = useState("");
 	const [selectedLanguage, setSelectedLanguage] = useState("");
 	const [open, setOpen] = useState(false);
+	const [colors, setColors] = useState<Colors>({
+		accent: "",
+		background: "",
+		neutral: "",
+		primary: "",
+		secondary: "",
+		text: "",
+	});
 
 	const handleSelectedTemplate = (template: string) => {
 		setSelectedTemplate(template);
@@ -37,19 +60,20 @@ const AiModal = ({ onSubmitPrompt }: AiModalProps) => {
 			return;
 		}
 
-		// const refinedPrompt = await generateRefinePrompt(userPrompt);
-
-		// console.log("refined prompt: ", refinedPrompt);
-
 		if (userPrompt.trim()) {
-			onSubmitPrompt(userPrompt.trim());
+			onSubmit({
+				prompt: userPrompt.trim(),
+				colors,
+				language: selectedLanguage,
+				template: selectedTemplate,
+			});
 			setOpen(false);
 		}
 	};
 
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
-			<DialogTrigger className={""} asChild>
+			<DialogTrigger asChild>
 				<Button variant={"default"}>
 					New Page
 					<PlusSquareIcon />
@@ -65,13 +89,18 @@ const AiModal = ({ onSubmitPrompt }: AiModalProps) => {
 						modification later.
 					</DialogDescription>
 				</DialogHeader>
+
+				{/* template selector */}
 				<TemplateSelector onSelect={handleSelectedTemplate} />
+
+				{/* user prompt area */}
 				<AiPromptInputArea prompt={userPrompt} setPrompt={updateUserPrompt} />
+
+				{/* language selector */}
 				<LanguageSelector onSelect={setSelectedLanguage} />
-				{/* 	<Button onClick={handleGenerate}>
-					<WandSparklesIcon color="#b10abd" />
-					Refine
-				</Button> */}
+
+				{/* color selector */}
+				<ColorSelector onSelect={setColors} />
 
 				<Button onClick={handleGenerate}>Submit</Button>
 			</DialogContent>

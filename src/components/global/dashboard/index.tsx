@@ -1,5 +1,5 @@
 import { useState } from "react";
-import AiModal from "../ai-modal";
+import AiModal, { Colors } from "../ai-modal";
 import { ProjectTable } from "../list-pages";
 import {
 	Dialog,
@@ -17,9 +17,16 @@ import {
 	saveSelectedProjectId,
 } from "@/lib/storage";
 
+export type SubmitData = {
+	prompt?: string;
+	language?: string;
+	colors?: Colors;
+	template?: string;
+	projectId?: string;
+};
+
 interface DashboardProps {
-	setInitialPrompt: (prompt: string) => void;
-	setProjectId: (prompt: string) => void;
+	onSubmit: (data: SubmitData) => void;
 }
 
 export interface ProjectListData {
@@ -27,19 +34,19 @@ export interface ProjectListData {
 	name: string;
 }
 
-function Dashboard({ setInitialPrompt, setProjectId }: DashboardProps) {
+function Dashboard({ onSubmit }: DashboardProps) {
 	const [projects, setProjects] = useState<ProjectListData[]>(
 		loadProjectsList()
 	);
 	const [openDeleteAll, setOpenDeleteAll] = useState(false);
 
-	const handleSubmit = (prompt: string) => {
-		setInitialPrompt(prompt);
+	const handleSubmit = (data: SubmitData) => {
 		const newProject = { id: crypto.randomUUID(), name: "Untitled Project" };
 		const newProjects = [newProject, ...projects];
 
 		saveProjectsList(newProjects);
 		setProjects(newProjects);
+		onSubmit(data);
 	};
 
 	const handleDelete = (projectId: string) => {
@@ -64,7 +71,9 @@ function Dashboard({ setInitialPrompt, setProjectId }: DashboardProps) {
 
 	const handleProjectSelect = (projectId: string) => {
 		saveSelectedProjectId(projectId);
-		setProjectId(projectId);
+		onSubmit({
+			projectId,
+		});
 	};
 
 	return (
@@ -79,7 +88,7 @@ function Dashboard({ setInitialPrompt, setProjectId }: DashboardProps) {
 						<h4>Here you can create new pages.</h4>
 					</div>
 					<div className="space-x-2">
-						<AiModal onSubmitPrompt={handleSubmit} />
+						<AiModal onSubmit={handleSubmit} />
 						<Dialog open={openDeleteAll} onOpenChange={setOpenDeleteAll}>
 							<DialogTrigger asChild>
 								<Button variant="destructive">Delete All</Button>

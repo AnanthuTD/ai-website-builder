@@ -8,8 +8,12 @@ export function TemplateSelector({ onSelect }: Props) {
 	return (
 		<ToggleGroup
 			type="single"
-			className="bg-gray-500"
-      onValueChange={onSelect}
+			className="gap-2"
+			onValueChange={(value) => {
+				if (value) {
+					onSelect(value);
+				}
+			}}
 		>
 			<ToggleGroupItem value="Health & Fitness" aria-label="Health & Fitness">
 				Health & Fitness
@@ -19,6 +23,12 @@ export function TemplateSelector({ onSelect }: Props) {
 			</ToggleGroupItem>
 			<ToggleGroupItem value="E-commerce" aria-label="E-commerce">
 				E-commerce
+			</ToggleGroupItem>
+			<ToggleGroupItem value="Portfolio" aria-label="Portfolio">
+				Portfolio
+			</ToggleGroupItem>
+			<ToggleGroupItem value="Blog" aria-label="Blog">
+				Blog
 			</ToggleGroupItem>
 		</ToggleGroup>
 	);

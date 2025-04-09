@@ -1,7 +1,6 @@
 import StudioEditor from "@grapesjs/studio-sdk/react";
-import "@grapesjs/studio-sdk/style";
 import AiChatBox from "../ai-tools";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
 	loadProjectBlocksData,
 	saveProjectBlocksData,
@@ -9,6 +8,8 @@ import {
 	saveProjectData,
 } from "@/lib/storage";
 import { toast } from "sonner";
+import { SubmitData } from "../dashboard";
+import { sampleTemplates } from "@/lib/templates";
 
 interface Content {
 	html: string;
@@ -21,14 +22,20 @@ export interface Block {
 	content: string;
 }
 
-export default function Editor({
-	initialPrompt,
-	projectId = "",
-}: {
-	initialPrompt: string;
-	projectId: string;
-}) {
+export default function Editor({ data }: { data: SubmitData }) {
+	const { projectId = "" } = data;
 	const [editor, setEditor] = useState<any>(null);
+
+	useEffect(() => {
+		const link = document.createElement("link");
+		link.rel = "stylesheet";
+		link.href = "../../../../node_modules/@grapesjs/studio-sdk/dist/style.css";
+		document.head.appendChild(link);
+
+		return () => {
+			document.head.removeChild(link);
+		};
+	}, []);
 
 	const updatePage = (content: Content) => {
 		if (editor) {
@@ -45,6 +52,13 @@ export default function Editor({
 	};
 
 	const getPageContent = (editorInstance: any) => {
+		if (!editorInstance.getHtml && data.template) {
+			const tem = sampleTemplates[data.template];
+			return {
+				html: tem.html || "",
+				css: tem.css || "",
+			};
+		}
 		return {
 			html: editorInstance?.getHtml() || "",
 			css: editorInstance?.getCss() || "",
@@ -82,7 +96,7 @@ export default function Editor({
 		<StudioEditor
 			className="h-screen"
 			options={{
-				licenseKey: "",
+				licenseKey: import.meta.env.VITE_GRAPESJS_PUBLIC_KEY,
 				storage: {
 					type: "self",
 					autosaveChanges: 5,
@@ -171,7 +185,9 @@ export default function Editor({
 													component: ({ editor }) => {
 														return (
 															<AiChatBox
-																initialPrompt={initialPrompt}
+																initialPrompt={data?.prompt ?? ""}
+																language={data.language ?? ""}
+																colors={data.colors ?? null}
 																onUpdateContent={updatePage}
 																initialContent={getPageContent(editor)}
 																updateAiGeneratedBlock={(blocks) =>

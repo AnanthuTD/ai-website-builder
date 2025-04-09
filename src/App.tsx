@@ -1,16 +1,17 @@
 import { useState, useEffect } from "react";
 import "./App.css";
 import Editor from "./components/global/studio-editor";
-import Dashboard from "./components/global/dashboard";
-import { loadSelectedProjectId } from "./lib/storage";
+import Dashboard, { SubmitData } from "./components/global/dashboard";
+import { loadSelectedProjectId, saveSelectedProjectId } from "./lib/storage";
 import { Toaster } from "./components/ui/sonner";
 
 function App() {
 	const [page, setPage] = useState(() => {
-		return localStorage.getItem("selectedPage") || "editor";
+		return localStorage.getItem("selectedPage") || "dashboard";
 	});
-	const [initialPrompt, setInitialPrompt] = useState("");
-	const [projectId, setProjectId] = useState("");
+	const [data, setData] = useState<SubmitData | null>({
+		projectId: loadSelectedProjectId(),
+	});
 
 	const handlePageChange = (newPage: string) => {
 		setPage(newPage);
@@ -25,16 +26,17 @@ function App() {
 	}, []);
 
 	useEffect(() => {
-		if (projectId) {
+		if (data && data.projectId) {
 			handlePageChange("editor");
 		}
-	}, [projectId]);
+	}, [data]);
+
+	const handleSubmit = (data: SubmitData) => {
+		if (data.projectId) setData(data);
+	};
 
 	return (
 		<div className="min-h-screen flex flex-col">
-			<Toaster />
-
-			{/* Navigation Bar */}
 			<nav className="bg-gray-800 text-white p-4 flex justify-between items-center">
 				<div className="text-lg font-bold">Website Builder</div>
 				<div className="space-x-4">
@@ -44,37 +46,25 @@ function App() {
 								? "bg-blue-500"
 								: "bg-gray-600 hover:bg-gray-500"
 						}`}
-						onClick={() => handlePageChange("dashboard")}
+						onClick={() => {
+							saveSelectedProjectId('')
+							handlePageChange("dashboard");
+						}}
 					>
 						Dashboard
-					</button>
-					<button
-						className={`px-3 py-1 rounded ${
-							page === "editor"
-								? "bg-blue-500"
-								: "bg-gray-600 hover:bg-gray-500"
-						}`}
-						onClick={() => handlePageChange("editor")}
-					>
-						Editor
 					</button>
 				</div>
 			</nav>
 
-			{/* Main Content */}
-			{page === "editor" ? (
-				<div className="flex-1">
-					<Editor
-						initialPrompt={initialPrompt}
-						projectId={projectId || loadSelectedProjectId()}
-					/>
-				</div>
-			) : (
-				<Dashboard
-					setInitialPrompt={setInitialPrompt}
-					setProjectId={setProjectId}
-				/>
-			)}
+			<main className="flex-1 relative z-0">
+				{page === "editor" ? (
+					<Editor data={data} />
+				) : (
+					<Dashboard onSubmit={handleSubmit} />
+				)}
+			</main>
+
+			<Toaster />
 		</div>
 	);
 }

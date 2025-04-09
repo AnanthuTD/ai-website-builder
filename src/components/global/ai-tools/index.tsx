@@ -11,12 +11,16 @@ import { toast } from "sonner";
 import { generateHtmlCssWithHuggingFace } from "@/services/huggingface";
 import { convertToBlocks } from "@/services/convertToBlocks";
 import { Block } from "../studio-editor";
+import { Colors } from "../ai-modal";
+import { generateHtmlCss } from "@/services/generateHtmlCss";
 
 interface Props {
 	initialPrompt: string;
 	onUpdateContent: ({ css, html }: { html: string; css: string }) => void;
 	initialContent?: { html: string; css: string };
 	updateAiGeneratedBlock: (blocks: Block[]) => void;
+	language: string;
+	colors: Colors | null;
 }
 
 const AiChatBox = ({
@@ -24,6 +28,8 @@ const AiChatBox = ({
 	onUpdateContent,
 	initialContent = { css: "", html: "" },
 	updateAiGeneratedBlock,
+	colors,
+	language,
 }: Props) => {
 	const userId = "userId";
 	const [chats, setChats] = useState<IChatFlat[]>([]);
@@ -76,7 +82,8 @@ const AiChatBox = ({
 
 		setIsGenerating(true);
 		try {
-			const response = await generateHtmlCssWithHuggingFace(prompt, content);
+			// const response = await generateHtmlCssWithHuggingFace(prompt, content, language, colors);
+			const response = await generateHtmlCss(prompt, content, language, colors);
 			if (response?.html) {
 				setContent(response);
 				onUpdateContent(response);
