@@ -5,22 +5,6 @@ import Dashboard, { SubmitData } from "./components/global/dashboard";
 import { loadSelectedProjectId, saveSelectedProjectId } from "./lib/storage";
 import { Toaster } from "./components/ui/sonner";
 
-const sampleData = {
-	prompt:
-		"My name is ananthu td. the portfolio should contain a section to list my projects as well along with all other sections. I am a MERN stack developer.",
-	colors: {
-		accent: "",
-		background: "",
-		neutral: "",
-		primary: "#00ffe4",
-		secondary: "",
-		text: "",
-	},
-	language: "en",
-	template: "Portfolio",
-	projectId: "e7e70af5-4ea1-4e87-9b67-fd3e525a3a35",
-};
-
 function App() {
 	const [page, setPage] = useState(() => {
 		return localStorage.getItem("selectedPage") || "editor";
