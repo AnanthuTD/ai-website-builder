@@ -28,3 +28,9 @@ A modern, AI-powered website builder that allows users to create custom web page
 - npm or yarn
 - A Hugging Face API key (for Deepseek model integration)
 - Gemini API key
+
+## Demo
+
+Check out this short demo video to see the AI Website Builder in action:
+
+[![AI Website Builder Demo](https://img.youtube.com/vi/tnyLSFLCHIw/0.jpg)](https://www.youtube.com/watch?v=tnyLSFLCHIw)
