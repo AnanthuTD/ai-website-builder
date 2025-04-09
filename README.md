@@ -1,54 +1,30 @@
-# React + TypeScript + Vite
+# AI Website Builder
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern, AI-powered website builder that allows users to create custom web pages effortlessly. Built with [Vite](https://vitejs.dev/) for a fast development experience and [GrapesJS](https://grapesjs.com/) for a powerful drag-and-drop editor, this tool leverages AI to generate websites based on user prompts, templates, and customizable options.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Prompt-Based Generation**: Users can input a prompt (e.g., "Create a blog page with a dark theme") to generate a website.
+- **Template Selection**: Choose from predefined templates (e.g., Blog, Portfolio, E-commerce) to kickstart the design.
+- **Language & Colors**: Customize the language and color scheme (primary, secondary, accent, etc.) for the generated page.
+- **AI Prompt Refinement**: If no template is selected, the AI refines the user's prompt before generating the page.
+- **Page Refinement**: Modify existing pages by providing additional prompts to the AI (e.g., "Add a sidebar with categories").
+- **Dual AI Models**: Supports code generation using two models:
+  - **Gemini**: A custom AI model for HTML/CSS generation.
+  - **Deepseek (Hugging Face)**: An alternative model hosted on Hugging Face for diverse outputs.
+- **GrapesJS Integration**: Convert AI-generated content into editable GrapesJS blocks for further customization.
 
-## Expanding the ESLint configuration
+## Tech Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **Frontend**: Vite (React + TypeScript)
+- **Editor**: GrapesJS
+- **AI**: Custom Gemini model + Deepseek (via Hugging Face API)
+- **UI Components**: Shadcn/ui (Tailwind CSS-based)
+- **Storage**: LocalStorage for project persistence
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+## Prerequisites
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+- Node.js (v16 or higher)
+- npm or yarn
+- A Hugging Face API key (for Deepseek model integration)
+- Gemini API key
