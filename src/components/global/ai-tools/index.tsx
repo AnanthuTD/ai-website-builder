@@ -8,7 +8,6 @@ import { CircleStopIcon, SendHorizontal } from "lucide-react";
 import ChatFlat from "../chat-box/ChatFlat";
 import { generateRefinePrompt } from "@/services/generateRefinePrompt";
 import { toast } from "sonner";
-import { generateHtmlCss } from "@/services/generateHtmlCss";
 import { generateHtmlCssWithHuggingFace } from "@/services/huggingface";
 
 interface Props {

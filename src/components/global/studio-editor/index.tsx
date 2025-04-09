@@ -1,8 +1,13 @@
 import StudioEditor from "@grapesjs/studio-sdk/react";
 import "@grapesjs/studio-sdk/style";
 import AiChatBox from "../ai-tools";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { loadProjectData, saveProjectData } from "@/lib/storage";
+
+interface Content {
+	html: string;
+	css: string;
+}
 
 export default function Editor({
 	initialPrompt,
@@ -11,27 +16,28 @@ export default function Editor({
 	initialPrompt: string;
 	projectId: string;
 }) {
-	const [code, setCode] = useState({ html: "", css: "" });
 	const [editor, setEditor] = useState<any>(null);
 
-	const updateContent = ({ css, html }: { html: string; css: string }) => {
-		setCode({ html, css });
-	};
-
-	useEffect(() => {
-		if (editor && code.html) {
+	const updatePage = (content: Content) => {
+		if (editor) {
 			try {
-				editor.setComponents(code.html);
+				editor.setComponents(content.html);
 
 				const css = editor.Css;
 				css.clear();
-				css.addRules(code.css);
+				css.addRules(content.css);
 			} catch (error) {
 				console.error("Error in use effect: ", error);
 			}
 		}
-	}, [code, editor]);
+	};
 
+	const getPageContent = (editorInstance: any) => {
+		return {
+			html: editorInstance?.getHtml() || "",
+			css: editorInstance?.getCss() || "",
+		};
+	};
 
 	return (
 		<StudioEditor
@@ -120,12 +126,12 @@ export default function Editor({
 											children: [
 												{
 													type: "custom",
-													component: () => {
+													component: ({ editor }) => {
 														return (
 															<AiChatBox
 																initialPrompt={initialPrompt}
-																onUpdateContent={updateContent}
-																initialContent={code}
+																onUpdateContent={updatePage}
+																initialContent={getPageContent(editor)}
 															/>
 														);
 													},
