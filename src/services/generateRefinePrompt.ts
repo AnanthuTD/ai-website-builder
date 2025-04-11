@@ -1,57 +1,51 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 interface ChatMessage {
-	role: string;
-	content: string;
+    role: string;
+    content: string;
 }
 
 interface WebContent {
-	html: string;
-	css: string;
+    html: string;
+    css: string;
 }
 
 export async function generateRefinePrompt(
-	userPrompt: string,
-	chatHistory: ChatMessage[] = [],
-	content?: WebContent
+    userPrompt: string,
+    chatHistory: ChatMessage[] = [],
+    content?: WebContent
 ): Promise<string | null> {
-	if (!userPrompt?.trim()) {
-		console.error("🔴 Prompt is empty");
-		return null;
-	}
+    if (!userPrompt?.trim()) {
+        console.error("🔴 Prompt is empty");
+        return null;
+    }
 
-	try {
-		const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY || "");
-		const model = genAI.getGenerativeModel({
-			model: "gemini-1.5-flash-latest",
-		});
+    try {
+        const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY || "");
+        const model = genAI.getGenerativeModel({
+            model: "gemini-1.5-flash-latest",
+        });
 
-		// Format chat history for context
-		const historyContext =
-			chatHistory.length > 0
-				? `**Conversation Context:**\n${chatHistory
-						.map(
-							(msg) =>
-								`${msg.role === "user" ? "User" : "Assistant"}: ${msg.content}`
-						)
-						.join("\n")}\n\n`
-				: "";
+        const historyContext =
+            chatHistory.length > 0
+                ? `**Conversation Context:**\n${chatHistory
+                      .map((msg) => `${msg.role === "user" ? "User" : "Assistant"}: ${msg.content}`)
+                      .join("\n")}\n\n"`
+                : "";
 
-		// Format existing content for analysis
-		const existingContent = content?.html
-			? `**Existing HTML/CSS Content:**\n\n` +
-			  `HTML Structure:\n${content.html.substring(0, 1000)}${
-					content.html.length > 1000 ? "... [truncated]" : ""
-			  }\n\n` +
-			  `CSS Styles:\n${content.css.substring(0, 500)}${
-					content.css.length > 500 ? "... [truncated]" : ""
-			  }\n\n` +
-			  `Note: Analyze but DO NOT repeat the existing code in your response. Focus on improvements and refinements.`
-			: "No existing content provided";
+        const existingContent = content?.html
+            ? `**Existing HTML/CSS Content:**\n\n` +
+              `HTML Structure:\n${content.html.substring(0, 1000)}${
+                  content.html.length > 1000 ? "... [truncated]" : ""
+              }\n\n` +
+              `CSS Styles:\n${content.css.substring(0, 500)}${
+                  content.css.length > 500 ? "... [truncated]" : ""
+              }\n\n` +
+              `Note: Analyze the existing content and provide specific modification instructions.`
+            : "No existing content provided";
 
-		const systemInstruction = `
-You are an expert web design assistant helping to refine and improve webpage designs. 
-Consider both the conversation context and any existing content below.
+        const systemInstruction = `
+You are an expert web design assistant tasked with creating a detailed design specification for a webpage based on the user's request and any existing content. Consider the conversation context and existing content below.
 
 ${historyContext}
 
@@ -63,82 +57,70 @@ ${userPrompt}
 ---
 
 **Your Task:**
-1. Analyze the existing content (if provided)
-2. Refine the webpage description based on the user's request
-3. Provide specific, actionable suggestions for improvement
-
-**Focus Areas:**
-1. **Overall Goal/Purpose** - Does the current implementation match the intended purpose?
-2. **Structure Analysis** - Is the HTML structure logical and semantic?
-3. **Style Evaluation** - Does the CSS properly support the design goals?
-4. **Improvement Suggestions** - Specific recommendations for each section
+- Analyze the user's request and existing content (if provided).
+- Produce a structured design specification that outlines the webpage's purpose, structure, and style.
+- If existing content is provided, include specific modification instructions for each section.
 
 **Output Format:**
+**Design Specification:**
 
-Current Implementation Analysis:
-[Brief evaluation of existing content]
+**Overall Goal/Purpose:**  
+[Concise statement of the webpage's purpose based on the user's request]
 
-Suggested Refinements:
+**Header:**  
+- [Specific design requirements or modifications, e.g., background, text style, animations]
 
-Overall Goal/Purpose:
-[Concise statement of refined purpose]
+**Navigation:**  
+- [Requirements or modifications, e.g., layout, menu items, responsive behavior]
 
-Header:
-[Current evaluation] → [Suggested improvements]
+**Hero Section:**  
+- [Requirements or modifications, e.g., imagery, text, buttons]
 
-Navigation:
-[Current evaluation] → [Suggested refinements]
+**Main Content Sections:**  
+- [Section Name]: [Requirements or modifications, e.g., layout, content type]
+- [Section Name]: [Requirements or modifications]
 
-Hero Section:
-[Current evaluation] → [Suggested enhancements]
+**Call-to-Action:**  
+- [Requirements or modifications, e.g., button styles, placement]
 
-Main Content Sections:
-- [Section 1]: [Current state] → [Recommended changes]
-- [Section 2]: [Current state] → [Recommended changes]
-...
+**Footer:**  
+- [Requirements or modifications, e.g., content, styling]
 
-Call-to-Action:
-[Current CTAs evaluation] → [Optimization suggestions]
-
-Footer:
-[Current evaluation] → [Improvement ideas]
-
-Additional Recommendations:
-[Any other suggestions for accessibility, performance, or maintainability]
+**Additional Requirements:**  
+- [e.g., color scheme, accessibility features, responsiveness]
 
 **Guidelines:**
-- Be specific and actionable
-- Reference but don't repeat existing code
-- Prioritize suggestions based on impact
-- Consider mobile responsiveness
-- Note any accessibility concerns
-- Still NO code generation - focus on conceptual improvements`;
+- Be specific and actionable (e.g., "Use a dark stone texture background" instead of "Improve the background").
+- If modifying existing content, specify what to change (e.g., "Add a fade-in animation to the existing header").
+- Do not generate code—just provide conceptual design requirements.
+- Ensure suggestions align with the user's intent and enhance engagement.
+`;
 
-		const generationConfig = {
-			temperature: 0.5, // More focused responses when analyzing existing code
-			topP: 0.85,
-			maxOutputTokens: 2500,
-		};
+        const generationConfig = {
+            temperature: 0.5,
+            topP: 0.85,
+            maxOutputTokens: 2500,
+        };
 
-		const result = await model.generateContent({
-			contents: [
-				{
-					role: "user",
-					parts: [{ text: systemInstruction }],
-				},
-			],
-			generationConfig,
-		});
+        const result = await model.generateContent({
+            contents: [
+                {
+                    role: "user",
+                    parts: [{ text: systemInstruction }],
+                },
+            ],
+            generationConfig,
+        });
 
-		const response = result.response;
-		if (!response?.text()) {
-			console.error("🔴 Empty API response");
-			return null;
-		}
+        const response = result.response;
+        if (!response?.text()) {
+            console.error("🔴 Empty API response");
+            return null;
+        }
 
-		return response.text();
-	} catch (error) {
-		console.error("🔴 API Error:", error);
-		throw error;
-	}
+        return response.text();
+    } catch (error) {
+        console.error("🔴 API Error:", error);
+        throw error;
+    }
 }
