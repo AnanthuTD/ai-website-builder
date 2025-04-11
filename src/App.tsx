@@ -38,8 +38,21 @@ function App() {
 
 	return (
 		<div className="min-h-screen flex flex-col bg-white">
-			<nav className="bg-white text-gray-900 p-4 flex justify-between items-center border-b border-gray-200 shadow-sm">
-				<div className="text-lg font-semibold">Website Builder</div>
+			<nav className="bg-white text-gray-900 px-4 flex justify-between items-center border-b border-gray-200 shadow-sm">
+				<div
+					className="flex items-center cursor-pointer"
+					onClick={() => {
+						saveSelectedProjectId("");
+						handlePageChange("dashboard");
+					}}
+				>
+					<img
+						src="/logo.png"
+						alt="Website Builder Logo"
+						className="h-20 w-auto mr-2"
+					/>
+				</div>
+
 				<div className="space-x-4">
 					<button
 						className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
