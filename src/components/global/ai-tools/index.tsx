@@ -49,7 +49,7 @@ const AiChatBox = ({
   const [isGenerating, setIsGenerating] = useState(false);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const [content, setContent] = useState(initialContent);
-  const [selectedModel, setSelectedModel] = useState<"gimini" | "deepseek">("gimini");
+  const [selectedModel, setSelectedModel] = useState<"gimini" | "deepseek">("deepseek");
 
   const handleGenerateBlocks = async () => {
     if (!initialContent.html) return;
